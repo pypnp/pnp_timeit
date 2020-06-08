@@ -12,8 +12,9 @@ class Pnp_Timeit:
     Pnp_Timeit can be swtiched ON or OFF, default is OFF.
     """
     
-    ENABLE_TIMEIT=False
-    LOGGER_NAME="pnp.library"
+    G_ENABLE_TIMEIT = False
+    G_LOGGER_DEFAULT_NAME = "pnp.library"
+    G_LOGGER = None
 
     @classmethod
     def timeit(cls, func):
@@ -26,10 +27,15 @@ class Pnp_Timeit:
 
                 time_end = datetime.utcnow()
                 time_diff_seconds = (time_end - time_begin).total_seconds()
-                logger = logging.getLogger(cls.LOGGER_NAME)
+                if cls.G_LOGGER is None:
+                    logger = logging.getLogger(cls.G_LOGGER_DEFAULT_NAME)
+                    logger.addHandler(logging.StreamHandler())
+                    logger.setLevel(logging.INFO)
+                else:
+                    logger = cls.G_LOGGER
 
                 dict_time_info = {"func": func.__name__, "args":args, "kwargs":kwargs, "time_cost_seconds":time_diff_seconds}
-                logger.debug("{}".format(json.dumps(dict_time_info, default=cls.__default_converter)))
+                logger.info("{}".format(json.dumps(dict_time_info, default=cls.__default_converter)))
 
                 return response
             else:
@@ -39,11 +45,13 @@ class Pnp_Timeit:
 
 
     @classmethod
-    def enable(cls):
+    def enable(cls, logger=None):
         """
         Process scope enable, default is OFF 
         """
-        Pnp_Timeit.ENABLE_TIMEIT = True
+        Pnp_Timeit.G_ENABLE_TIMEIT = True
+        if logging:
+            cls.G_LOGGER = logger
 
 
     @classmethod
@@ -51,7 +59,8 @@ class Pnp_Timeit:
         """
         Session level disable, default is DISABLE
         """
-        Pnp_Timeit.ENABLE_TIMEIT = False
+        Pnp_Timeit.G_ENABLE_TIMEIT = False
+        cls.G_LOGGER = None
         
     @classmethod
     def is_enable(cls) -> bool:
@@ -62,8 +71,7 @@ class Pnp_Timeit:
             True: enabled
             False: disabled
         """
-        return Pnp_Timeit.ENABLE_TIMEIT
-
+        return Pnp_Timeit.G_ENABLE_TIMEIT
 
 
     @classmethod

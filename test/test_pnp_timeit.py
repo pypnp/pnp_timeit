@@ -22,7 +22,7 @@ class TestPnpTimeit(unittest.TestCase):
         """
         self.stream = StringIO()
         self.handler = logging.StreamHandler(self.stream)
-        self.log = logging.getLogger(Pnp_Timeit.LOGGER_NAME)
+        self.log = logging.getLogger(Pnp_Timeit.G_LOGGER_DEFAULT_NAME)
         self.log.setLevel(logging.DEBUG)
         for handler in self.log.handlers: 
             self.log.removeHandler(handler)
